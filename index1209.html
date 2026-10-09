@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Site Web Personnel – Marouane Berninz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Saira:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: { primary: '#0d1b3e', secondary: '#3b82f6', gray2: '#4a4a4d', bgp: '#e8eef8' },
+    fontFamily: { poppins: ['Poppins', 'sans-serif'], saira: ['Saira', 'sans-serif'] }
+  } }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.4.38/dist/vue.global.prod.js"></script>
+<style>
+  :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body { background: #e8eef8; }
+  .fade-enter-active, .fade-leave-active { transition: opacity .25s, transform .25s; }
+  .fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(8px); }
+</style>
+</head>
+<body class="font-poppins text-primary">
+<div id="app" class="min-h-screen flex flex-col">
+
+  <!-- Navigation -->
+  <header class="sticky top-0 z-10 bg-white border-b border-[#ccc] transition-shadow"
+          :style="{ boxShadow: scrolled ? '0 5px 15px rgba(0,0,0,0.1)' : 'none' }">
+    <nav class="max-w-[1100px] mx-auto px-4 sm:px-8 py-4 sm:py-6 flex items-center justify-between">
+      <a href="#accueil" class="text-primary text-lg sm:text-2xl font-semibold">Site Web Personnel</a>
+      <ul class="flex gap-0.5 sm:gap-2 text-xs sm:text-base">
+        <li v-for="l in links" :key="l.id">
+          <a :href="'#' + l.id"
+             :class="['px-2 sm:px-4 py-2 rounded-[5px] font-semibold transition-all duration-300', view === l.id ? 'bg-secondary text-white' : 'text-primary hover:text-secondary']">
+            {{ l.label }}
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Vues (SPA) -->
+  <main :class="['flex-1 transition-colors duration-300', fonds[view]]">
+    <transition name="fade" mode="out-in">
+
+      <!-- Accueil -->
+      <section v-if="view === 'accueil'" key="accueil" class="max-w-[1100px] mx-auto px-4 sm:px-8 py-24 sm:py-32 text-center sm:text-left">
+        <p><span class="text-secondary font-bold text-[20px]">Bonjour, je suis</span></p>
+        <h1 class="font-saira text-2xl sm:text-[30px] leading-snug text-primary mt-2.5" style="text-shadow:3px 3px 3px rgba(0,0,0,0.2)">{{ me.nom }}</h1>
+        <p class="text-base sm:text-[20px] text-primary my-2.5 font-medium">{{ me.titre }}</p>
+        <div class="flex flex-wrap justify-center sm:justify-start gap-3 mt-8">
+          <a href="#apropos" class="bg-secondary text-white px-5 py-2 text-sm rounded-[5px] transition-all duration-300 hover:bg-[#1d4ed8]">A propos de moi</a>
+          <a href="#contact" class="border border-secondary text-secondary px-5 py-2 text-sm rounded-[5px] transition-all duration-300 hover:bg-secondary hover:text-white">Me contacter</a>
+        </div>
+      </section>
+
+      <!-- À propos -->
+      <section v-else-if="view === 'apropos'" key="apropos" class="max-w-[1100px] mx-auto px-4 sm:px-8 py-16 sm:py-24">
+        <h2 class="font-saira text-center text-[38px] text-primary font-semibold tracking-[1px]">A propos</h2>
+        <hr class="w-[100px] h-[3px] bg-secondary border-0 mt-[5px] mx-auto">
+        <div class="mt-16 grid md:grid-cols-[2fr_1fr] gap-x-12 text-center md:text-left">
+          <div>
+            <h3 class="text-[28px] text-primary mb-5">Je suis <span class="text-secondary">{{ me.nom }}</span> , développeur web débutant</h3>
+            <p class="text-gray2 mb-5 leading-[1.8]">{{ me.bio1 }}<br>{{ me.bio2 }}</p>
+          </div>
+          <div>
+            <p v-for="d in me.infos" :key="d[0]" class="text-gray2 mb-5 pb-[5px] border-b border-[#ddd] break-words">{{ d[0] }} :<b> {{ d[1] }}</b></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Compétences -->
+      <section v-else-if="view === 'competences'" key="competences" class="max-w-[1100px] mx-auto px-4 sm:px-8 py-16 sm:py-[75px]">
+        <h2 class="text-center text-[38px] text-white font-semibold tracking-[1px]">Compétences</h2>
+        <hr class="w-[100px] h-[3px] bg-secondary border-0 mt-[5px] mx-auto">
+        <div class="mt-8 bg-[#071025] rounded-[10px] p-2 sm:p-4 grid sm:grid-cols-2">
+          <div v-for="c in competences" :key="c.nom" class="text-white bg-black m-2.5 sm:m-4 p-4 rounded-[10px] transition-all duration-300 hover:shadow-[10px_10px_10px_rgba(59,130,246,0.05)]">
+            <div class="flex justify-between mb-2 text-lg font-semibold"><span>{{ c.nom }}</span><span>{{ c.niveau }}%</span></div>
+            <div class="h-2.5 rounded-full bg-gray2 overflow-hidden">
+              <div class="h-full rounded-full bg-secondary transition-all duration-700" :style="{ width: c.niveau + '%' }"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section v-else key="contact" class="max-w-[1100px] mx-auto px-4 sm:px-8 py-16">
+        <h2 class="font-saira text-center text-[38px] text-primary font-semibold tracking-[1px]"><span class="text-secondary">Contactez</span> moi</h2>
+        <div class="mt-12 max-w-lg mx-auto bg-white shadow-[3px_3px_20px_rgba(0,0,0,0.2)] px-6 py-6 sm:px-12 sm:py-8 rounded-[10px]">
+          <div v-if="envoye" class="text-primary">
+            <p>Message envoyé avec succès ! Merci {{ form.nom }}.</p>
+            <button @click="reinitialiser" class="mt-4 bg-secondary text-white px-5 py-2 text-sm rounded-[5px] transition-all duration-300 hover:bg-[#1d4ed8]">Envoyer un autre message</button>
+          </div>
+          <div v-else>
+            <div v-for="champ in champs" :key="champ.k" class="my-5">
+              <label :for="champ.k" class="block text-sm font-medium text-primary mb-1">{{ champ.label }}</label>
+              <textarea v-if="champ.k === 'message'" :id="champ.k" v-model.trim="form[champ.k]" rows="6" :placeholder="champ.label"
+                class="block w-full p-2.5 bg-bgp border border-[#bbb] outline-none"></textarea>
+              <input v-else :id="champ.k" :type="champ.type" v-model.trim="form[champ.k]" :placeholder="champ.label"
+                class="block w-full p-2.5 bg-bgp border border-[#bbb] outline-none">
+              <p v-if="touche && erreurs[champ.k]" class="text-sm text-red-600 mt-1">{{ erreurs[champ.k] }}</p>
+            </div>
+            <button @click="envoyer" :disabled="chargement" class="bg-secondary text-white px-5 py-2 text-sm rounded-[5px] cursor-pointer transition-all duration-300 hover:bg-[#1d4ed8] disabled:opacity-60">{{ chargement ? 'Envoi en cours...' : 'Submit' }}</button>
+            <p v-if="erreurApi" class="text-sm text-red-600 mt-3">{{ erreurApi }}</p>
+          </div>
+        </div>
+      </section>
+
+    </transition>
+  </main>
+</div>
+
+<script>
+const { createApp, ref, reactive, computed, onMounted, onUnmounted } = Vue;
+
+// Adresse qui reçoit les messages (activation par e-mail au 1er envoi)
+const API_URL = 'https://formsubmit.co/ajax/mberninz99z@gmail.com';
+
+createApp({
+  setup() {
+    const links = [
+      { id: 'accueil', label: 'Accueil' },
+      { id: 'apropos', label: 'À propos' },
+      { id: 'competences', label: 'Compétences' },
+      { id: 'contact', label: 'Contact' }
+    ];
+    // Fond de chaque vue, comme les sections du site d'origine
+    const fonds = { accueil: 'bg-bgp', apropos: 'bg-white', competences: 'bg-primary', contact: 'bg-bgp' };
+
+    const me = {
+      nom: 'Marouane Berninz',
+      titre: 'Étudiant de la filière Génie Informatique',
+      bio1: 'Je suis étudiant en Génie Informatique, passionné par le développement web et les nouvelles technologies. J’aime concevoir des interfaces simples, modernes et faciles à utiliser.',
+      bio2: 'Toujours motivé à apprendre, je travaille continuellement à améliorer mes compétences en HTML, CSS et JavaScript, tout en découvrant de nouveaux outils et frameworks.',
+      infos: [['Âge', '18'], ['Email', 'mberninz99z@gmail.com'], ['Adresse', 'Les amicales – Agadir']]
+    };
+    // Compétences du site d'origine ; les pourcentages sont indicatifs
+    const competences = [
+      { nom: 'HTML', niveau: 90 }, { nom: 'CSS', niveau: 85 },
+      { nom: 'C', niveau: 70 }, { nom: 'Javascript', niveau: 75 }
+    ];
+    const champs = [
+      { k: 'nom', label: 'Name', type: 'text' },
+      { k: 'email', label: 'Email', type: 'email' },
+      { k: 'message', label: 'Message', type: 'text' }
+    ];
+
+    // Ombre de la navbar au scroll
+    const scrolled = ref(false);
+    const onScroll = () => { scrolled.value = window.scrollY > 50; };
+
+    // Routage SPA par hash
+    const lireHash = () => {
+      const h = location.hash.replace('#', '');
+      return links.some(l => l.id === h) ? h : 'accueil';
+    };
+    const view = ref(lireHash());
+    const maj = () => { view.value = lireHash(); window.scrollTo(0, 0); };
+    onMounted(() => { window.addEventListener('hashchange', maj); window.addEventListener('scroll', onScroll); });
+    onUnmounted(() => { window.removeEventListener('hashchange', maj); window.removeEventListener('scroll', onScroll); });
+
+    // Formulaire
+    const form = reactive({ nom: '', email: '', message: '' });
+    const touche = ref(false);
+    const envoye = ref(false);
+    const erreurs = computed(() => ({
+      nom: form.nom ? '' : 'Le nom est requis.',
+      email: /^\S+@\S+\.\S+$/.test(form.email) ? '' : 'Email invalide.',
+      message: form.message.length >= 10 ? '' : 'Le message doit contenir au moins 10 caractères.'
+    }));
+    // Requête API : POST JSON vers FormSubmit (change l'adresse ci-dessus si besoin)
+    const chargement = ref(false);
+    const erreurApi = ref('');
+    const envoyer = async () => {
+      touche.value = true;
+      erreurApi.value = '';
+      if (!Object.values(erreurs.value).every(e => !e)) return;
+      chargement.value = true;
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ name: form.nom, email: form.email, message: form.message, _subject: 'Nouveau message du site' })
+        });
+        const data = await res.json();
+        if (!res.ok || data.success === 'false' || data.success === false) throw new Error(data.message || 'Erreur serveur');
+        envoye.value = true;
+      } catch (e) {
+        erreurApi.value = 'Oups ! Une erreur est survenue. Veuillez réessayer.';
+      } finally {
+        chargement.value = false;
+      }
+    };
+    const reinitialiser = () => {
+      Object.assign(form, { nom: '', email: '', message: '' });
+      touche.value = false; envoye.value = false;
+    };
+
+    return { links, fonds, me, competences, champs, view, scrolled, form, touche, envoye, erreurs, chargement, erreurApi, envoyer, reinitialiser };
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
